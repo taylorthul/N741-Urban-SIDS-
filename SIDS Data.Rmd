@@ -3,15 +3,81 @@ title: "SIDS Data"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+knitr::opts_chunk$set(comment=NA, prompt=TRUE, out.width=750, fig.height=8, fig.width=8)
+library(Rcmdr)
+library(car)
+library(RcmdrMisc)
+library(plyr)
+
+# include this code chunk as-is to enable 3D graphs
+library(rgl)
+knitr::knit_hooks$set(webgl = hook_webgl)
 
 library(readxl)
 COD <- read_excel("~/Box Sync/Multiple Cause of Death, 1999-2015.xls")
 View(COD)
 
 #just trying to see if anything I run will work
+#to get collum names
 names(COD)
+summary(COD)
+
+#renaming variables
+# df = dataframe
+# old.var.name = The name you don't like anymore
+# new.var.name = The name you want to get
+names(COD)[names(COD) == 'Infant Age Groups Code'] <- 'age.group'
+names(COD)[names(COD) == '2013 Urbanization Code'] <- 'urban.code'
+names(COD)[names(COD) == 'Crude Rate'] <- 'crude.rate'
+
+
+#recode deaths into categorical infant age groups
+COD$age.cat <- revalue(COD$age.group, c("1d"="1", "1-6d"="2", "7-27d"="3", "28-364d"="4"))
+
+#need to change crude rate to numeric variable
+COD$crude.rate<-as.numeric(COD$crude.rate) 
+summary(COD)
+
+#summary statistics
+summary(COD)
+
+numSummary(COD[,c("urban.code", "age.cat", "age.group","Deaths", "Population")], 
+  statistics=c("mean", "sd", "IQR", "quantiles"), quantiles=c(0,.25,.5,.75,1))
+
+mean(COD$Deaths)
+mean(COD$Population)
+
+#aggregate data
+aggregate(Deaths ~ age.group, COD, mean)
+aggregate(Deaths ~ urban.code, COD, mean)
+
+#there is some non numeric data in crude.rate, change to NA
+COD[COD=="Unreliable"]<-""
+COD
+
+
+#try the means of crude rates again
+aggregate(crude.rate ~ age.group, COD, mean)
+aggregate(crude.rate ~ urban.code, COD, mean)
+
+#some exploratory analysis of the data
+#histogram
+with(COD, Hist(crude.rate, scale="frequency", breaks="Sturges", col="red"))
+#add lables
+title (main= "Crude Rate of Deaths Overall")
+
+
+#plot some of the data 
+library(ggplot2)
+ggplot(COD, aes(x = age.group, y = Deaths)) +
+  geom_boxplot(outlier.colour = "hotpink") +
+  geom_jitter(position = position_jitter(width = 0.1, height = 0), alpha = 1/4)
+
+```
+
+
+
 
 
 ```
