@@ -2,21 +2,23 @@
 title: "SIDS Data"
 output: html_document
 ---
-```{r setup, include=TRUE}
-knitr::opts_chunk$set(echo = TRUE)
 
-options(repos="https://cran.rstudio.com" )
-getwd()
-setwd("/Users/thultaylor123/Documents/N741/N741-Urban-SIDS-")
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA, prompt=TRUE, out.width=750, fig.height=8, fig.width=8)
+library(Rcmdr)
+library(RcmdrMisc)
+```
+
+
+```{r}
+library(rgl)
+knitr::knit_hooks$set(webgl = hook_webgl)
 
 library(knitr)
 library(car)
 library(plyr)
-
-
-# include this code chunk as-is to enable 3D graphs
-library(rgl)
-knitr::knit_hooks$set(webgl = hook_webgl)
+library(ggplot2)
 
 library(readxl)
 COD <- read_excel("~/Box Sync/Multiple Cause of Death, 1999-2015.xls")
@@ -46,9 +48,6 @@ summary(COD)
 
 #summary statistics
 summary(COD)
-
-numSummary(COD[,c("urban.code", "age.cat", "age.group","Deaths", "Population")], 
-  statistics=c("mean", "sd", "IQR", "quantiles"), quantiles=c(0,.25,.5,.75,1))
 
 mean(COD$Deaths)
 mean(COD$Population)
