@@ -1,26 +1,33 @@
 ---
 title: "SIDS Data"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 
 ```{r setup, include=FALSE}
+#get all the libraries and graphic options set
 knitr::opts_chunk$set(comment=NA, prompt=TRUE, out.width=750, fig.height=8, fig.width=8)
 library(Rcmdr)
 library(RcmdrMisc)
-```
-
-
-```{r}
 library(rgl)
 knitr::knit_hooks$set(webgl = hook_webgl)
-
 library(knitr)
 library(car)
 library(plyr)
 library(ggplot2)
+library(dplyr)
+library(devtools)
+library(DT)
+library(xtable)
 
+```
+
+Below is the section of R code to clean and arrrainge the data in a more useful way.  
+```{r}
 library(readxl)
+#read in the data
 COD <- read_excel("~/Box Sync/Multiple Cause of Death, 1999-2015.xls")
 View(COD)
 
@@ -29,7 +36,7 @@ View(COD)
 names(COD)
 summary(COD)
 
-#renaming variables
+# renaming variables
 # df = dataframe
 # old.var.name = The name you don't like anymore
 # new.var.name = The name you want to get
@@ -39,32 +46,44 @@ names(COD)[names(COD) == 'Crude Rate'] <- 'crude.rate'
 names(COD)[names(COD) == '2013 Urbanization'] <- 'urbanization'
 names(COD)[names(COD) == 'UCD - ICD-10 130 Cause List (Infants) Code'] <- 'icd'
 
-#recode deaths into categorical infant age groups
+# recode deaths into categorical infant age groups
 COD$age.cat <- revalue(COD$age.group, c("1d"="1", "1-6d"="2", "7-27d"="3", "28-364d"="4"))
 
-#need to change crude rate to numeric variable
+# there is some non numeric data in crude.rate, change to NA
+COD[COD=="Unreliable"]<-""
+COD
+
+# need to change crude rate to numeric variable
 COD$crude.rate<-as.numeric(COD$crude.rate) 
 summary(COD)
 
 #summary statistics
 summary(COD)
-
 mean(COD$Deaths)
 mean(COD$Population)
 
-#aggregate data
+```
+Now I will try to make some pretty tables:
+
+```{r}
+#this is where some code will go for tables that I have not quite yet figured out how to make becuase none of the code has worked so far 
+```
+
+
+
+```{r}
+#aggregate data (and not pretty tables)
 aggregate(Deaths ~ age.group, COD, mean)
 aggregate(Deaths ~ urban.code, COD, mean)
-
-#there is some non numeric data in crude.rate, change to NA
-COD[COD=="Unreliable"]<-""
-COD
-
-
-#try the means of crude rates again
 aggregate(crude.rate ~ age.group, COD, mean)
 aggregate(crude.rate ~ urban.code, COD, mean)
 aggregate(urban.code ~ Population, COD, mean)
+
+
+```
+
+Do some exploratory analysis and graphing (all of this will have explinations in the final draft)
+```{r}
 
 #some exploratory analysis of the data
 #histogram
@@ -101,7 +120,6 @@ library(ggplot2)
 ggplot(COD, aes(x = age.group, y = Deaths)) +
   geom_boxplot(outlier.colour = "hotpink") +
   geom_jitter(position = position_jitter(width = 0.1, height = 0), alpha = 1/4)
-
 
 ```
 
@@ -142,7 +160,7 @@ ggplot(COD2, aes(x=Deaths, y=urbanization, color=age.cat)) +
 
 ```
 
-The ICD 10 code for SIDS is GR130-135
+The ICD 10 code for SIDS is GR130-135 so I will use it to make a subset of the data looking at only SIDS
 
 ```{r}
 #data looking at just SIDS
@@ -165,7 +183,6 @@ ggplot(COD3, aes(x=age.cat, y=Deaths, fill=urbanization)) + geom_boxplot()
 ```
 
 Start fitting some models- SIDS first then the whole data set 
-
 
 
 ```{r}
@@ -193,7 +210,7 @@ is.factor(COD3.train$urbanization.f)
 fit <- lm(Deaths ~ urbanization.f, data= COD3.train)
 summary(fit)
 ```
-Well none of this is significant. 
+Well none of this is significant. There were MANY fewer observation in the SIDS subset than in the whole thing so that may be contributing.
 
 ```{r}
 #now looking at age category
@@ -218,7 +235,7 @@ summary(fit3)# show results
 ```
 
 Well my theory is disproven. Womp womp.
-Let me try modeling with the whole data set. 
+Let me try modeling with the whole data set just because I have it already.  Does the association change when we look at all causes of death for infants between 2-364 days of age? 
 
 ```{r}
 # divide the dataset into a training and a testing set based on a random uniform number on fixed seed, which in this case we are using the date
@@ -260,10 +277,12 @@ is.factor(COD2.train$age.f)
 fit4 <- lm(Deaths ~ age.f, data=COD2.train)
 summary(fit4)# show results
 ```
-Look at everything
+Look at everything. 
 ```{r}
 #fit a model with all variables
 fit5 <- lm(Deaths ~ age.f + urbanization.f, data=COD2.train)
 summary(fit5)# show results
 ```
 
+Discussion.  
+The git hub for this is located at ...
