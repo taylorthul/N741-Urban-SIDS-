@@ -2,13 +2,17 @@
 title: "SIDS Data"
 output: html_document
 ---
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
 
-```{r}
-knitr::opts_chunk$set(comment=NA, prompt=TRUE, out.width=750, fig.height=8, fig.width=8)
-library(Rcmdr)
+options(repos="https://cran.rstudio.com" )
+getwd()
+setwd("/Users/thultaylor123/Documents/N741/N741-Urban-SIDS-")
+
+library(knitr)
 library(car)
-library(RcmdrMisc)
 library(plyr)
+
 
 # include this code chunk as-is to enable 3D graphs
 library(rgl)
@@ -30,7 +34,8 @@ summary(COD)
 names(COD)[names(COD) == 'Infant Age Groups Code'] <- 'age.group'
 names(COD)[names(COD) == '2013 Urbanization Code'] <- 'urban.code'
 names(COD)[names(COD) == 'Crude Rate'] <- 'crude.rate'
-
+names(COD)[names(COD) == '2013 Urbanization'] <- 'urbanization'
+names(COD)[names(COD) == 'UCD - ICD-10 130 Cause List (Infants) Code'] <- 'icd'
 
 #recode deaths into categorical infant age groups
 COD$age.cat <- revalue(COD$age.group, c("1d"="1", "1-6d"="2", "7-27d"="3", "28-364d"="4"))
@@ -60,6 +65,7 @@ COD
 #try the means of crude rates again
 aggregate(crude.rate ~ age.group, COD, mean)
 aggregate(crude.rate ~ urban.code, COD, mean)
+aggregate(urban.code ~ Population, COD, mean)
 
 #some exploratory analysis of the data
 #histogram
@@ -67,6 +73,29 @@ with(COD, Hist(crude.rate, scale="frequency", breaks="Sturges", col="red"))
 #add lables
 title (main= "Crude Rate of Deaths Overall")
 
+#scatterplot
+plot(COD$Population, COD$Deaths)
+
+#histogram
+with(COD, Hist(Deaths, scale="frequency", breaks="Sturges", col="red"))
+#add lables
+title (main= "Crude Number of Deaths Overall")
+
+# histogram of deaths by urbanization
+ggplot(COD, aes(x=Deaths, fill=urbanization)) +
+    geom_histogram(binwidth=50, position="identity")
+
+#histogram of crude rate by urbanization
+ggplot(COD, aes(x=crude.rate, fill=urbanization)) +
+    geom_histogram(position="identity")
+
+#histogram of crude rate by age
+ggplot(COD, aes(x=crude.rate, fill=age.cat)) +
+    geom_histogram(position="identity")
+
+#scatterplots to look at data against one another
+ggplot(COD, aes(x=crude.rate, y=Population)) +
+    geom_point(shape=1)  
 
 #plot some of the data 
 library(ggplot2)
@@ -74,30 +103,168 @@ ggplot(COD, aes(x = age.group, y = Deaths)) +
   geom_boxplot(outlier.colour = "hotpink") +
   geom_jitter(position = position_jitter(width = 0.1, height = 0), alpha = 1/4)
 
-```
-
-
-
-
 
 ```
 
-## R Markdown
+There are a lot of outliers in the one day age range.  This definately isn't SIDS. Going back into the data I see this is observation in row 28, which is deaths associated with 'Certain conditions originating in the perinatal period' 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+library(ggplot2)
+ggplot(COD, aes(x = age.cat, y = crude.rate)) +
+  geom_boxplot(outlier.colour = "hotpink") +
+  geom_jitter(position = position_jitter(width = 0.1, height = 0), alpha = 1/4)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+#same plot but adding urbanziation varible 
+ggplot(COD, aes(x=age.cat, y=age.cat, fill=urbanization)) + geom_boxplot()
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+I shoud look at just the day 2- 365. This is really more of the informaiton I am interested in anyways. 
+
+```{r}
+# using subset function 
+COD2 <- subset(COD, age.cat > 1, 
+select=c(urbanization:age.cat))
+summary(COD2)
+
+#new plot using data with age > 1 day  
+ggplot(COD2, aes(x=age.cat, y=crude.rate, fill=urbanization)) + geom_boxplot()
+
+# Density plots with semi-transparent fill
+ggplot(COD2, aes(x=crude.rate, fill=urbanization)) + geom_density(alpha=.3)
+
+#scatterplot
+ggplot(COD2, aes(x=Deaths, y=urbanization, color=age.cat)) +
+    geom_point(shape=1) +
+    scale_colour_hue(l=50) + # Use a slightly darker palette than normal
+    geom_smooth(method=lm,   # Add linear regression lines
+                se=FALSE)    # Don't add shaded confidence region
+
+```
+
+The ICD 10 code for SIDS is GR130-135
+
+```{r}
+#data looking at just SIDS
+COD3 <- subset(COD, icd == "GR130-135", 
+select=c(urbanization:age.cat))
+summary(COD3)
+
+aggregate(crude.rate ~ age.group, COD3, mean)
+aggregate(crude.rate ~ urban.code, COD3, mean)
+aggregate(Deaths ~ urban.code, COD3, mean)
+
+```
+
+```{r}
+#explore data
+ggplot(COD3, aes(x=crude.rate, fill=urbanization)) + geom_density(alpha=.3)
+ggplot(COD3, aes(x=Deaths, fill=urbanization)) + geom_density(alpha=.3)
+ggplot(COD3, aes(x=age.cat, y=Deaths, fill=urbanization)) + geom_boxplot()
+
+```
+
+Start fitting some models- SIDS first then the whole data set 
+
+
+
+```{r}
+# divide the dataset into a training and a testing set based on a random uniform number on fixed seed, which in this case we are using the date
+# this step is also creating a new variable and adding it to the data set which is a distribution of random numbers from 0 to 1 
+
+set.seed(20170328)
+COD3$group <- runif(length(COD3$Deaths), min = 0, max = 1)
+
+#what random forests do is this process over and over again and makes the aggregate which might be called bootstrapping?
+
+COD3.train <- subset(COD3, group <= 0.80)
+COD3.test <- subset(COD3, group > 0.80)
+
+#see if it worked
+summary(COD3.train)
+summary(COD3.test) 
+
+
+#recoding categorical variables as factors
+COD3.train$urbanization.f <- factor(COD3.train$urbanization)
+is.factor(COD3.train$urbanization.f)
+
+#is urbanization a predictor varaible?
+fit <- lm(Deaths ~ urbanization.f, data= COD3.train)
+summary(fit)
+```
+Well none of this is significant. 
+
+```{r}
+#now looking at age category
+is.factor(COD3$age.cat)
+
+#recoding categorical variables as factors
+COD3.train$age.f <- factor(COD3.train$age.cat)
+is.factor(COD3.train$age.f)
+
+#fit a model with all variables
+fit2 <- lm(Deaths ~ age.f, data=COD3.train)
+summary(fit2)# show results
+
+```
+
+This, of course, makes tons of sense because age category 4 is much longer time (almost the whole year).  Does anything change when we put them together?
+
+```{r}
+#fit a model with all variables
+fit3 <- lm(Deaths ~ age.f + urbanization.f, data=COD3.train)
+summary(fit3)# show results
+```
+
+Well my theory is disproven. Womp womp.
+Let me try modeling with the whole data set. 
+
+```{r}
+# divide the dataset into a training and a testing set based on a random uniform number on fixed seed, which in this case we are using the date
+# this step is also creating a new variable and adding it to the data set which is a distribution of random numbers from 0 to 1 
+
+set.seed(20170328)
+COD2$group <- runif(length(COD2$Deaths), min = 0, max = 1)
+
+#what random forests do is this process over and over again and makes the aggregate which might be called bootstrapping?
+
+COD2.train <- subset(COD2, group <= 0.80)
+COD2.test <- subset(COD2, group > 0.80)
+
+#see if it worked
+summary(COD2.train)
+summary(COD2.test) 
+
+#are my categorical variables factors?
+is.factor(COD2$urbanization) #no this was not
+
+#recoding categorical variables as factors
+COD2.train$urbanization.f <- factor(COD2.train$urbanization)
+is.factor(COD2.train$urbanization.f)
+
+#is urbanization a predictor varaible?
+fit3 <- lm(Deaths ~ urbanization.f, data= COD2.train)
+summary(fit3)
+```
+
+Great so there is some significance here. 
+
+```{r}
+
+#recoding categorical variables as factors
+COD2.train$age.f <- factor(COD2.train$age.cat)
+is.factor(COD2.train$age.f)
+
+#fit a model with all variables
+fit4 <- lm(Deaths ~ age.f, data=COD2.train)
+summary(fit4)# show results
+```
+Look at everything
+```{r}
+#fit a model with all variables
+fit5 <- lm(Deaths ~ age.f + urbanization.f, data=COD2.train)
+summary(fit5)# show results
+```
+
