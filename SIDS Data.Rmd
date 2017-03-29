@@ -4,7 +4,7 @@ output:
   word_document: default
   html_document: default
 ---
-
+I am planning to use the template but I just wanted to try on my own at first. 
 
 ```{r setup, include=FALSE}
 #get all the libraries and graphic options set
@@ -70,7 +70,7 @@ Now I will try to make some pretty tables:
 ```
 
 
-
+These are some not-so-pretty tables that I am using just to look at the data and how it is related to one another. 
 ```{r}
 #aggregate data (and not pretty tables)
 aggregate(Deaths ~ age.group, COD, mean)
@@ -82,7 +82,7 @@ aggregate(urban.code ~ Population, COD, mean)
 
 ```
 
-Do some exploratory analysis and graphing (all of this will have explinations in the final draft)
+Do some exploratory analysis and graphing (all of this will have explinations in the final draft).  I will not use all these graphs in the final report but I wanted to practice making them.  I will also go back in and tidy it up with lables and titles for each one chosen.  
 ```{r}
 
 #some exploratory analysis of the data
@@ -137,7 +137,7 @@ ggplot(COD, aes(x = age.cat, y = crude.rate)) +
 ggplot(COD, aes(x=age.cat, y=age.cat, fill=urbanization)) + geom_boxplot()
 ```
 
-I shoud look at just the day 2- 365. This is really more of the informaiton I am interested in anyways. 
+I decide I shoud look at just the day 2- 365. This is really more of the informaiton I am interested in anyways and will help remove outliers.  I make a subset removing the first day deaths and explore it. 
 
 ```{r}
 # using subset function 
@@ -160,7 +160,8 @@ ggplot(COD2, aes(x=Deaths, y=urbanization, color=age.cat)) +
 
 ```
 
-The ICD 10 code for SIDS is GR130-135 so I will use it to make a subset of the data looking at only SIDS
+This is intersting but I also want to just look at the SIDS data within the overall data set.
+The ICD 10 code for SIDS is GR130-135 so I will use it to make a subset of the data looking at only SIDS across all time periods. 
 
 ```{r}
 #data looking at just SIDS
@@ -182,7 +183,7 @@ ggplot(COD3, aes(x=age.cat, y=Deaths, fill=urbanization)) + geom_boxplot()
 
 ```
 
-Start fitting some models- SIDS first then the whole data set 
+So I've done most of the exploratory analysis and cleaning at this point.  I will start making and testing models.  
 
 
 ```{r}
@@ -210,7 +211,7 @@ is.factor(COD3.train$urbanization.f)
 fit <- lm(Deaths ~ urbanization.f, data= COD3.train)
 summary(fit)
 ```
-Well none of this is significant. There were MANY fewer observation in the SIDS subset than in the whole thing so that may be contributing.
+Well none of this is significant. There were MANY fewer observation in the SIDS subset than in the whole thing so that may be contributing and I will adress this in my limitation section.  I may go back and re-code some of the other 'unknown' deaths that are considered SIDS but not classified as so to see if that gives more data but I have not decided quite yet. 
 
 ```{r}
 #now looking at age category
@@ -226,7 +227,7 @@ summary(fit2)# show results
 
 ```
 
-This, of course, makes tons of sense because age category 4 is much longer time (almost the whole year).  Does anything change when we put them together?
+Age category is a significant variable.  This, of course, makes tons of sense because age category 4 is much longer time (almost the whole year).  Does anything change when we put them together?
 
 ```{r}
 #fit a model with all variables
@@ -234,7 +235,7 @@ fit3 <- lm(Deaths ~ age.f + urbanization.f, data=COD3.train)
 summary(fit3)# show results
 ```
 
-Well my theory is disproven. Womp womp.
+Well my theory is disproven. There does not seem to be any association between SIDS and urbanization.
 Let me try modeling with the whole data set just because I have it already.  Does the association change when we look at all causes of death for infants between 2-364 days of age? 
 
 ```{r}
@@ -244,7 +245,7 @@ Let me try modeling with the whole data set just because I have it already.  Doe
 set.seed(20170328)
 COD2$group <- runif(length(COD2$Deaths), min = 0, max = 1)
 
-#what random forests do is this process over and over again and makes the aggregate which might be called bootstrapping?
+#creating the train and test dataset
 
 COD2.train <- subset(COD2, group <= 0.80)
 COD2.test <- subset(COD2, group > 0.80)
@@ -265,7 +266,7 @@ fit3 <- lm(Deaths ~ urbanization.f, data= COD2.train)
 summary(fit3)
 ```
 
-Great so there is some significance here. 
+Great so there is some significance here. I will explore/ explain this more in the final report.
 
 ```{r}
 
@@ -284,5 +285,8 @@ fit5 <- lm(Deaths ~ age.f + urbanization.f, data=COD2.train)
 summary(fit5)# show results
 ```
 
-Discussion.  
-The git hub for this is located at ...
+Discussion. 
+This is where the discussion will go! 
+
+
+The git hub for this is located at (https://github.com/taylorthul/N741-Urban-SIDS-/blob/master/SIDS%20Data.Rmd) [https://github.com/taylorthul/N741-Urban-SIDS-/blob/master/SIDS%20Data.Rmd]
