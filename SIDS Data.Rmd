@@ -1,5 +1,6 @@
 ---
-title: "SIDS Data"
+title: "SIDS Data Milestone 2 Draft"
+date: "March 29, 2017"
 output:
   word_document: default
   html_document: default
@@ -63,6 +64,8 @@ mean(COD$Deaths)
 mean(COD$Population)
 
 ```
+Discussion explaining the summary statistics so I won't be useing the raw code. 
+
 Now I will try to make some pretty tables:
 
 ```{r}
