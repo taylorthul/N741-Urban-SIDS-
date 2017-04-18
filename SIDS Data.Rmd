@@ -7,6 +7,11 @@ output:
 ---
 I am planning to use the template but I just wanted to try on my own at first. 
 
+```{r}
+devtools::install_github("melindahiggins2000/N741pkg")
+```
+
+
 ```{r setup, include=FALSE}
 #get all the libraries and graphic options set
 knitr::opts_chunk$set(comment=NA, prompt=TRUE, out.width=750, fig.height=8, fig.width=8)

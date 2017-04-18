@@ -20,68 +20,173 @@ knitr::opts_chunk$set(message = FALSE)
 library(rmarkdown)
 library(knitr)
 library(N741pkg)
+library(knitr)
+library(car)
+library(plyr)
+library(ggplot2)
+library(dplyr)
+library(devtools)
+library(DT)
+library(xtable)
 ```
 
 ## Abstract
 
 _TYPE IN YOUR TEXT HERE - DELETE THIS FOR FINAL REPORT: Please provide an abstract with only a sentence or two each on these items: the purpose of your project, your research questions, analysis methods, results, and conclusions (approximately 300 words)._
 
+
+
 ## Introduction
 
-_As a nurse, my background is in the neonatal intensive care unit (NICU).  In my capacity as a bedside nurse I often discharge patients to home, a process that includes extensive education regarding prevention of sudden infant death syndrome (SIDS).  SIDS, also known as crib or cot death, is the sudden, unexplained death of an infant younger than 1 year old and is the leading cause of death in children one month to one year of age.  Many risk factors have been identified including: prone sleeping, bed sharing, loose bedding, maternal smoking, and prematurity.  The national campaign Back-to-Sleep has great success in lowering rates of SIDS, however, the etiology is still poorly understood.  
-_As a researcher, my interests focus on maternal/ infant health so I often encounter vital statistics and other data on SIDS reporting on a variety of variables.  However, I often wonder what other variables not reported may influence SIDS rates.  One is particular is if urbanization is at all associated with SIDS rates.  I would postulate more urban settings would facilitate greater exposure to education campaigns and other resources but also could increase exposure to air pollution and communicable diseases.  There, could of course be many confounding variables in the proposed relationship but the first step is establishing if any association exists.
-_The focal question I would like to explore for this project is: “is there an association between urbanization and sudden infant death syndrome (SIDS).”  Beyond learning basic data management techniques in R I would like to take this opportunity to explore high-level vital data.  Planning a career in health research almost assures I will be working with data from the Center for Disease Control, likely in multiple capacities so I would like to become familiar with their systems of data management and use. Furthermore, as discussed above I would like to explore the relationship between urbanization and SIDS on a population level.  
+_As a nurse, my background is in the neonatal intensive care unit (NICU).  In my capacity as a bedside nurse I often discharge patients to home, a process that includes extensive education regarding prevention of sudden infant death syndrome (SIDS).  SIDS, also known as crib or cot death, is the sudden, unexplained death of an infant younger than 1 year old after thorough investigation (CDC, 2017).  SIDS is the leading cause of death in children one month to one year of age.  It is also included as a cause of death in sudden unexpected infant death (SUID), a category that also includes accidental suffocation and strangulation in bed as well as those deaths where the cause remains unknown without a complete investigation (CDC, 2017). Of the 3,7000 SIUD in the United States in 2015, 43% were attributed to SIDS and 32% of unknown cause (CDC, 2017). SUID is a significant health concern and has been the focus of much research and major public health efforts.  Many risk factors have been identified including: prone sleeping, bed sharing, loose bedding, maternal smoking, and premature birth (R).  A public education campaign, Safe to Sleep, launched in 1994 had great success in lowering the rate of SIDS death by more than 50% (NIH, 2017).  However since that time the rates have remained relatively unchanged and there are no clear answers regarding the etiology of the disease. 
+_As a researcher, my interests focus on maternal/ infant health so I often encounter vital statistics and other data on SIDS reporting on a variety of variables.  However, I often wonder what other variables not reported may influence SIDS rates.  One is particular is if urbanization is at all associated with SIDS rates.  I would postulate more urban settings would facilitate greater exposure to education campaigns and other resources but also could increase exposure to air pollution and communicable diseases.  There could, of course, be many confounding variables in the proposed relationship but the first step is establishing if any association exists.
+_Therefore the purpose of this paper is to explore any association between urbanization and sudden infant death syndrome (SIDS).  
 
 
 ## Dataset Description and Summary
 
 _TYPE IN YOUR TEXT HERE - DELETE THIS FOR FINAL REPORT: Please provide a description of your dataset and where you obtained your dataset (link to repository or other references). Include an overview of the variables or measures included in your dataset and which ones you are conceptualizing as covariates, predictors or outcomes as related to your research questions and final analysis models. Include any data "pre-processing" steps or "cleaning" you had to do (data "tidying", handling of outliers or unusual values, addressing missing data, etc) or any subsetting you did (selecting specific rows or columns) - for example, if you didn't use the complete dataset, please describe which variables were selected any why and any cases (rows) that were selected any why (e.g. only children from ages 6-17 were chosen because...)._
 
-```{r}
-# view the top rows of the mtcars dataset in the car package
-# put the information from head(mtcars) into a table
-# using knitr::kable()
-library(car)
-knitr::kable(head(mtcars),
-             caption="Top rows of the mtcars dataset")
-```
+To explore the relationship between SIDS and urbanization I will utilize the CDC Multiple Cause of Death database.  It contains mortality for all US counties based on the death certificate and includes demographic data as well as ICD-10 codes for cause of death and urbanization level. Unfortunately the CDC Wonder website does not allow access to the entire dataset rather some variables must be selected and a subset of data will be generated for use.  To have access to the 2013 urbanization level I was not also able to have the 2006 urbanization levels or demographic variables such as ethnicity.  My final subset included: 
+
+*2013 Urbanization Levels
+  +Large Central Metro
+  +Large Fringe Metro
+  +Medium Metro
+  +Small Metro
+  +Micropolitan
+  +NonCore (non-metro)
+  
+*Age Groups
+  +< 1 day
+  +1-6 days
+  +7-27 days
+  +28- 364 days
+  
+*ICD-10 Cause of Death
+*Number of Deaths
+*Population
+*Crude Death Rate
+
+2013 urbanization levels were selected as they were the most current and the age category was chosen to be consitent with the definition of SIDS.  The ICD-10 cause of death will give the most detailed way to extract death by SIDS as opposed to other causes.  I then did some data cleaning including creating categorical variables for age group and urbanization level.  There was some missing data (labeled as "unavailable") in the crude death rates. Thankfully there was no missing data in overal number of deaths. I chose to omit the missing data from the analysies containing the crude deaths varaibles since the raw numbers would still be represented in number of deaths. There were no unusual values or outliers to 'tidy.'  Overall the data was fairly clean and analysis could begin.  
+
+The CDC public databases located at: [https://wonder.cdc.gov/controller/datarequest/D77;jsessionid=4DC93A9C344C5A163A529948737DB795]( https://wonder.cdc.gov/controller/datarequest/D77;jsessionid=4DC93A9C344C5A163A5 29948737DB795)
 
 ## Dataset Summary and Visualization
 
 _TYPE IN YOUR TEXT HERE - DELETE THIS FOR FINAL REPORT: Add tables (descriptive statistics for both numeric and categorical variables) and plots here to help decribe and visualize the key elements in your project dataset. Hint: look back at what you submitted for Milestone 2_
+
+```{r}
+library(readxl)
+#read in the data
+COD <- read_excel("~/Box Sync/Multiple Cause of Death, 1999-2015.xls")
+View(COD)
+
+#just trying to see if anything I run will work
+#to get collum names
+names(COD)
+summary(COD)
+
+# there is some non numeric data in crude.rate, change to NA
+COD[COD=="Unreliable"]<-""
+
+# renaming variables
+# df = dataframe
+# old.var.name = The name you don't like anymore
+# new.var.name = The name you want to get
+names(COD)[names(COD) == 'Infant Age Groups Code'] <- 'age.group'
+names(COD)[names(COD) == '2013 Urbanization Code'] <- 'urban.code'
+names(COD)[names(COD) == 'Crude Rate'] <- 'crude.rate'
+names(COD)[names(COD) == '2013 Urbanization'] <- 'urbanization'
+names(COD)[names(COD) == 'UCD - ICD-10 130 Cause List (Infants) Code'] <- 'icd'
+
+# recode deaths into categorical infant age groups
+COD$age.cat <- revalue(COD$age.group, c("1d"="1", "1-6d"="2", "7-27d"="3", "28-364d"="4"))
+
+# need to change crude rate to numeric variable
+COD$crude.rate<-as.numeric(COD$crude.rate) 
+summary(COD)
+```
+
+```{r}
+#summary statistics
+summary(COD)
+mean(COD$Deaths)
+mean(COD$Population)
+```
 
 ### Example Summary Statistics Table - Numeric Variables
 
 _DELETE THIS FOR FINAL REPORT: This is an example summary statistics table for continuous/numeric variables in the mtcars dataset (Henderson and Velleman, 1981)._
 
 ```{r}
-m <- mtcars
-t1 <- N741pkg::tbl.continuous(m,m$mpg,"Miles per Gallon")
-t2 <- N741pkg::tbl.continuous(m,m$disp,"Engine Displacement")
-t3 <- N741pkg::tbl.continuous(m,m$wt,"Car Weight")
-t4 <- N741pkg::tbl.continuous(m,m$hp,"Horsepower")
-t5 <- N741pkg::tbl.continuous(m,m$qsec,"1/4 mile time")
-knitr::kable(rbind(t1,t2,t3,t4,t5),
-             caption = "Table of Summary Stats for Numeric Variables in mtcars")
+m <- COD
+t1 <- N741pkg::tbl.continuous(m,m$crude.rate,"Crude Rate")
+t2 <- N741pkg::tbl.continuous(m,m$Deaths,"Deaths")
+t3 <- N741pkg::tbl.continuous(m,m$Population,"City Population")
+knitr::kable(rbind(t1,t2,t3),
+             caption = "Table of Summary Stats for Numeric Variables in Causes of Death Data")
 ```
+
+```{r}
+m <- COD3
+t1 <- N741pkg::tbl.continuous(m,m$crude.rate,"Crude Rate")
+t2 <- N741pkg::tbl.continuous(m,m$Deaths,"Deaths")
+t3 <- N741pkg::tbl.continuous(m,m$Population,"City Population")
+knitr::kable(rbind(t1,t2,t3),
+             caption = "Table of Summary Stats for Numeric Variables in SIDS Deaths")
+```
+
 
 ### Example Summary Statistics Table - Categorical Variables
 
 _DELETE THIS FOR FINAL REPORT: These are examples of frequency tables for categorical/ordinal variables in the mtcars dataset._
 
 ```{r}
-gm <- dplyr::group_by(m,cyl)
-t1 <- N741pkg::tbl.cat(gm,gm$cyl)
+m <- COD
+gm <- dplyr::group_by(m,urbanization)
+t1 <- N741pkg::tbl.cat(gm,gm$urbanization)
 knitr::kable(t1,
-             caption = "Frequency Table for Number of Cylinders")
-gm <- dplyr::group_by(m,am)
-t1 <- N741pkg::tbl.cat(gm,gm$am)
+             caption = "Frequency Table for Urbanization")
+
+gm <- dplyr::group_by(m,`Infant Age Groups`)
+t1 <- N741pkg::tbl.cat(gm,gm$`Infant Age Groups`)
 knitr::kable(t1,
-             caption = "Frequency Table for Transmission")
-gm <- dplyr::group_by(m,gear)
-t1 <- N741pkg::tbl.cat(gm,gm$gear)
+             caption = "Frequency Table for Infant Age Groups")
+
+gm <- dplyr::group_by(m,`UCD - ICD-10 130 Cause List (Infants)`)
+t1 <- N741pkg::tbl.cat(gm,gm$`UCD - ICD-10 130 Cause List (Infants)`)
 knitr::kable(t1,
-             caption = "Frequency Table for Number of Forward Gears")
+             caption = "Frequency Table for ICD 10 Cause List of Death")
+```
+
+```{r}
+m <- COD3
+gm <- dplyr::group_by(m,urbanization)
+t1 <- N741pkg::tbl.cat(gm,gm$urbanization)
+knitr::kable(t1,
+             caption = "Frequency Table for Urbanization of SIDS Data")
+
+gm <- dplyr::group_by(m,`Infant Age Groups`)
+t1 <- N741pkg::tbl.cat(gm,gm$`Infant Age Groups`)
+knitr::kable(t1,
+             caption = "Frequency Table for Infant Age Groups of SIDS Data")
+
+```
+
+```{r}
+#trying with chaining
+COD %>% group_by(age.group) %>% summarise(avg=mean(Population))
+COD %>% group_by(age.group) %>% group_by(urban.code) %>% summarise(avg=mean(Deaths))
+
+#aggregate data 
+aggregate(Deaths ~ urbanization + age.group, COD, mean)
+aggregate(crude.rate ~ urbanization + age.group, COD, mean)
+
+#for SIDS
+aggregate(Deaths ~ urbanization + age.group, COD3, mean)
+aggregate(crude.rate ~ urbanization + age.group, COD3, mean)
+
 ```
 
 ### Example plot
