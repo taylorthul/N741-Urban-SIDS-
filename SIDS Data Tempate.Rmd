@@ -1,8 +1,10 @@
 ---
-title: "N741 Final Project: Urbanization and Suddent Infant Death"
+title: 'N741 Final Project: Urbanization and Suddent Infant Death'
 author: "Taylor Thul"
-date: "`r Sys.Date()`"
-output: html_document
+date: '`r Sys.Date()`'
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
