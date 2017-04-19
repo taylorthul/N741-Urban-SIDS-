@@ -1,6 +1,6 @@
 ---
-title: "N741 Final Project"
-author: "Your Name Here"
+title: "N741 Final Project: Urbanization and Suddent Infant Death"
+author: "Taylor Thul"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -38,16 +38,14 @@ _TYPE IN YOUR TEXT HERE - DELETE THIS FOR FINAL REPORT: Please provide an abstra
 
 ## Introduction
 
-_As a nurse, my background is in the neonatal intensive care unit (NICU).  In my capacity as a bedside nurse I often discharge patients to home, a process that includes extensive education regarding prevention of sudden infant death syndrome (SIDS).  SIDS, also known as crib or cot death, is the sudden, unexplained death of an infant younger than 1 year old after thorough investigation (CDC, 2017).  SIDS is the leading cause of death in children one month to one year of age.  It is also included as a cause of death in sudden unexpected infant death (SUID), a category that also includes accidental suffocation and strangulation in bed as well as those deaths where the cause remains unknown without a complete investigation (CDC, 2017). Of the 3,7000 SIUD in the United States in 2015, 43% were attributed to SIDS and 32% of unknown cause (CDC, 2017). SUID is a significant health concern and has been the focus of much research and major public health efforts.  Many risk factors have been identified including: prone sleeping, bed sharing, loose bedding, maternal smoking, and premature birth (R).  A public education campaign, Safe to Sleep, launched in 1994 had great success in lowering the rate of SIDS death by more than 50% (NIH, 2017).  However since that time the rates have remained relatively unchanged and there are no clear answers regarding the etiology of the disease. 
+_As a nurse, my background is in the neonatal intensive care unit (NICU).  In my capacity as a bedside nurse I often discharge patients to home, a process that includes extensive education regarding prevention of sudden infant death syndrome (SIDS).  SIDS, also known as crib or cot death, is the sudden, unexplained death of an infant younger than 1 year old after thorough investigation (CDC, 2017).  SIDS is the leading cause of death in children one month to one year of age.  It is also included as a cause of death in sudden unexpected infant death (SUID), a category that also includes accidental suffocation and strangulation in bed as well as those deaths where the cause remains unknown without a complete investigation (CDC, 2017). Of the 3,7000 SIUD in the United States in 2015, 43% were attributed to SIDS and 32% of unknown cause (CDC, 2017). SUID is a significant health concern and has been the focus of much research and major public health efforts.  Many risk factors have been identified including: prone sleeping, bed sharing, loose bedding, maternal smoking, and premature birth (Carlin & Moon, 2017).  A public education campaign, Safe to Sleep, launched in 1994 had great success in lowering the rate of SIDS death by more than 50% (NIH, 2017).  However since that time the rates have remained relatively unchanged and there are no clear answers regarding the etiology of the disease. 
 _As a researcher, my interests focus on maternal/ infant health so I often encounter vital statistics and other data on SIDS reporting on a variety of variables.  However, I often wonder what other variables not reported may influence SIDS rates.  One is particular is if urbanization is at all associated with SIDS rates.  I would postulate more urban settings would facilitate greater exposure to education campaigns and other resources but also could increase exposure to air pollution and communicable diseases.  There could, of course, be many confounding variables in the proposed relationship but the first step is establishing if any association exists.
 _Therefore the purpose of this paper is to explore any association between urbanization and sudden infant death syndrome (SIDS).  
 
 
 ## Dataset Description and Summary
 
-_TYPE IN YOUR TEXT HERE - DELETE THIS FOR FINAL REPORT: Please provide a description of your dataset and where you obtained your dataset (link to repository or other references). Include an overview of the variables or measures included in your dataset and which ones you are conceptualizing as covariates, predictors or outcomes as related to your research questions and final analysis models. Include any data "pre-processing" steps or "cleaning" you had to do (data "tidying", handling of outliers or unusual values, addressing missing data, etc) or any subsetting you did (selecting specific rows or columns) - for example, if you didn't use the complete dataset, please describe which variables were selected any why and any cases (rows) that were selected any why (e.g. only children from ages 6-17 were chosen because...)._
-
-To explore the relationship between SIDS and urbanization I will utilize the CDC Multiple Cause of Death database.  It contains mortality for all US counties based on the death certificate and includes demographic data as well as ICD-10 codes for cause of death and urbanization level. Unfortunately the CDC Wonder website does not allow access to the entire dataset rather some variables must be selected and a subset of data will be generated for use.  To have access to the 2013 urbanization level I was not also able to have the 2006 urbanization levels or demographic variables such as ethnicity.  My final subset included: 
+_To explore the relationship between SIDS and urbanization I will utilize the CDC Multiple Cause of Death database.  It contains mortality for all US counties based on the death certificate and includes demographic data as well as ICD-10 codes for cause of death and urbanization level. Unfortunately the CDC Wonder website does not allow access to the entire dataset rather some variables must be selected and a subset of data will be generated for use.  To have access to the 2013 urbanization level I was not also able to have the 2006 urbanization levels or demographic variables such as ethnicity.  My final subset included: 
 
 *2013 Urbanization Levels
   +Large Central Metro
@@ -58,24 +56,25 @@ To explore the relationship between SIDS and urbanization I will utilize the CDC
   +NonCore (non-metro)
   
 *Age Groups
-  +< 1 day
-  +1-6 days
-  +7-27 days
-  +28- 364 days
+  +< 1 day (Group 1)
+  +1-6 days (Group 2)
+  +7-27 days (Group 3)
+  +28- 364 days (Group 4)
   
 *ICD-10 Cause of Death
 *Number of Deaths
 *Population
 *Crude Death Rate
 
-2013 urbanization levels were selected as they were the most current and the age category was chosen to be consitent with the definition of SIDS.  The ICD-10 cause of death will give the most detailed way to extract death by SIDS as opposed to other causes.  I then did some data cleaning including creating categorical variables for age group and urbanization level.  There was some missing data (labeled as "unavailable") in the crude death rates. Thankfully there was no missing data in overal number of deaths. I chose to omit the missing data from the analysies containing the crude deaths varaibles since the raw numbers would still be represented in number of deaths. There were no unusual values or outliers to 'tidy.'  Overall the data was fairly clean and analysis could begin.  
+_2013 urbanization levels were selected as they were the most current and the age category was chosen to be consistent with the definition of SIDS. The urbanization variable is categorical and includes large central metro, large fringe metro, medium metro, small metro, and micropolitan. The multilevel categorization is well suited for health related analyses because it differentiates counties within large metropolitan areas into “central” and “fringe” to capture the possible differences between a true urban environment compared to highly populous suburban areas.    The ICD-10 cause of death will give the most detailed way to extract death by SIDS as opposed to other causes.  I then did some data cleaning for the entire dataset including creating categorical variables for age group and urbanization level.  There was some missing data (labeled as "unavailable") in the crude death rates. Thankfully there was no missing data in overall number of deaths. I chose to omit the missing data from the analysis containing the crude deaths variables since the raw numbers would still be represented in number of deaths. The deaths and crude rate variable was greatly skewed to the right so I performed a log10 transformation on both of them.  Both were far more normally distributed after so the transformed variable was used for the remainder of analysis.  I created a subset of data isolating SIDS as a cause of death using the ICD-10 code R95.  This resulted in a small amount of observations (n=23) which seemed insufficient for the scope of this project.  Therefore I chose to modify my questions and look at the association between urbanization and overall infant deaths then more specifically death as a result of SIDS.  Additionally as many SUID deaths are unexplained including all causes of death may capture some of them as well, for example 'other and unspecified accidents.' 
+_Overall the data was fairly clean and analysis could begin.  After some initial exploration it was noted there were some extreme outlines in the 'one day' age category.  Returning to the data I noted multiple large, outlining variables associated with prenatal and childbirth related deaths, such as 'certain conditions originating in the perinatal period.'  This cause of death is much more related to the prenatal period than infancy therefore I chose to eliminate the '1 day' age category from the overall analysis to avoid confounding with prenatal and birth related deaths.   
+
 
 The CDC public databases located at: [https://wonder.cdc.gov/controller/datarequest/D77;jsessionid=4DC93A9C344C5A163A529948737DB795]( https://wonder.cdc.gov/controller/datarequest/D77;jsessionid=4DC93A9C344C5A163A5 29948737DB795)
 
 ## Dataset Summary and Visualization
 
-_TYPE IN YOUR TEXT HERE - DELETE THIS FOR FINAL REPORT: Add tables (descriptive statistics for both numeric and categorical variables) and plots here to help decribe and visualize the key elements in your project dataset. Hint: look back at what you submitted for Milestone 2_
-
+#Summary of Overall Dataset 
 ```{r}
 library(readxl)
 #read in the data
@@ -105,19 +104,36 @@ COD$age.cat <- revalue(COD$age.group, c("1d"="1", "1-6d"="2", "7-27d"="3", "28-3
 
 # need to change crude rate to numeric variable
 COD$crude.rate<-as.numeric(COD$crude.rate) 
-summary(COD)
+
 ```
+#Summary of SIDS Subdata
 
 ```{r}
-#summary statistics
-summary(COD)
+# using subset function to eliminate day 1 age group
+COD2 <- subset(COD, age.cat > 1, 
+select=c(urbanization:age.cat))
+
+#data looking at just SIDS
+COD3 <- subset(COD, icd == "GR130-135", 
+select=c(urbanization:age.cat))
+summary(COD3)
+```
+
+
+The mean number of deaths is 
+
+```{r}
 mean(COD$Deaths)
+```
+
+The mean population is 
+```{r}
 mean(COD$Population)
 ```
 
-### Example Summary Statistics Table - Numeric Variables
 
-_DELETE THIS FOR FINAL REPORT: This is an example summary statistics table for continuous/numeric variables in the mtcars dataset (Henderson and Velleman, 1981)._
+### Summary Statistics Tables
+
 
 ```{r}
 m <- COD
@@ -138,10 +154,6 @@ knitr::kable(rbind(t1,t2,t3),
 ```
 
 
-### Example Summary Statistics Table - Categorical Variables
-
-_DELETE THIS FOR FINAL REPORT: These are examples of frequency tables for categorical/ordinal variables in the mtcars dataset._
-
 ```{r}
 m <- COD
 gm <- dplyr::group_by(m,urbanization)
@@ -153,12 +165,8 @@ gm <- dplyr::group_by(m,`Infant Age Groups`)
 t1 <- N741pkg::tbl.cat(gm,gm$`Infant Age Groups`)
 knitr::kable(t1,
              caption = "Frequency Table for Infant Age Groups")
-
-gm <- dplyr::group_by(m,`UCD - ICD-10 130 Cause List (Infants)`)
-t1 <- N741pkg::tbl.cat(gm,gm$`UCD - ICD-10 130 Cause List (Infants)`)
-knitr::kable(t1,
-             caption = "Frequency Table for ICD 10 Cause List of Death")
 ```
+#For Frequency Table of ICD 10 Cause List of Death see Appendix 1
 
 ```{r}
 m <- COD3
@@ -173,59 +181,260 @@ knitr::kable(t1,
              caption = "Frequency Table for Infant Age Groups of SIDS Data")
 
 ```
-
+#Aggregate Data Tables
 ```{r}
-#trying with chaining
-COD %>% group_by(age.group) %>% summarise(avg=mean(Population))
-COD %>% group_by(age.group) %>% group_by(urban.code) %>% summarise(avg=mean(Deaths))
-
 #aggregate data 
-aggregate(Deaths ~ urbanization + age.group, COD, mean)
-aggregate(crude.rate ~ urbanization + age.group, COD, mean)
+t2 <- aggregate(Deaths ~ urbanization + age.group, COD, mean)
+knitr::kable(t2,
+             caption = "Deaths By Urbanization and Age Group")
+
+t3 <- aggregate(crude.rate ~ urbanization + age.group, COD, mean)
+knitr::kable(t3,
+             caption = "Crude Death Rate By Urbanization and Age Group")
 
 #for SIDS
-aggregate(Deaths ~ urbanization + age.group, COD3, mean)
-aggregate(crude.rate ~ urbanization + age.group, COD3, mean)
+t4 <- aggregate(crude.rate ~ urbanization + age.group, COD3, mean)
+knitr::kable(t4,
+             caption = "SIDS Deaths By Urbanization and Age Group")
 
 ```
 
-### Example plot
 
-_DELETE THIS FOR FINAL REPORT: This is an example scatterplot from the mtcars dataset. The plot is of the mpg by car weight with colors by the number of cylinders used as a grouping variable. Note: as.factor() was used to treat cyl as a factor for grouping._
+### Graphic Representation of Data 
 
 ```{r}
-# example plot using mtcars dataset
-# scatterplot of mpg by car weight
-# points colored by number of cylinders as a factor
-# then linear model fit lines are added by
-# cylinder group. FInally a main title, axis labels
-# and a title for the legend are added.
+## using subset function 
+COD2 <- subset(COD, age.cat > 1, 
+select=c(urbanization:age.cat))
+
+##transform deaths data
+COD$deaths <- log10(COD$Deaths)
+COD2$deaths <- log10(COD2$Deaths)
+COD3$deaths <- log10(COD3$Deaths)
+COD$tcrude.rate <- log10(COD$crude.rate)
+COD2$tcrude.rate <- log10(COD2$crude.rate)
+COD3$tcrude.rate <- log10(COD3$crude.rate)
+
+#make the transformed rate a factor
+COD$tcrude.rate<-as.numeric(COD$tcrude.rate)
+COD2$tcrude.rate<-as.numeric(COD2$tcrude.rate)
+COD3$tcrude.rate<-as.numeric(COD3$tcrude.rate) 
+
+##histogram of new transformed deaths variable
+
+
+
+##some exploratory analysis of the data
 library(ggplot2)
-ggplot(mtcars, aes(x=wt, y=mpg, colour=as.factor(cyl))) +
+ggplot(COD2, aes(x=Population, y=deaths, colour=as.factor(age.cat))) +
   geom_point() +
   geom_smooth(method=lm) +
-  ggtitle("MPG by Car Weight Grouped by Number of Cylinders") +
-  xlab("Car Weight (in 1000 lbs)") +
-  ylab("Miles per (US) Gallons") +
-  guides(colour = guide_legend(title = "Cylinders"))
+  ggtitle("Deaths by Population Grouped by Age") +
+  xlab("Population") +
+  ylab("Deaths") +
+  guides(colour = guide_legend(title = "Age Group"))
+
+#new plot using data with age > 1 day  
+ggplot(COD2, aes(x= age.cat, y=deaths, fill=urbanization)) +
+  geom_boxplot() + 
+  ggtitle("Deaths by Age Group") + 
+  xlab ("Age Grouping") +
+  ylab ("Log10 Deaths")
+
+# Density plots with semi-transparent fill
+ggplot(COD2, aes(x=deaths, fill=urbanization)) +
+  geom_density(alpha=.3) +
+  ggtitle("Density Plot of Death by Urbanization Level") +
+  xlab ("Log10 Deaths") +
+  ylab ("Density")
+
+##COME BACK TO THIS IF TIME
+#histogram of crude rate by urbanization
+ggplot(COD2, aes(x=deaths, fill=urbanization)) +
+  geom_histogram(position="identity") +
+  ggtitle ("Deaths By Urbanization")
+  xlab ("Log10 Deaths")
+  
+#don't use
+#histogram of crude rate by age
+#ggplot(COD2, aes(x=tcrude.rate, fill=urbanization)) +
+  #geom_histogram(position="identity") +
+  #ggtitle ("Rate of Deaths By Urbanization")
+  #xlab ("Log10 Crude Rates")
+  
+#don't use
+#scatterplots to look at data against one another
+#ggplot(COD, aes(x=tcrude.rate, y=Population)) +
+    #geom_point(shape=1)  
+
+#plot some of the data 
+library(ggplot2)
+ggplot(COD2, aes(x = age.group, y = deaths)) +
+  geom_boxplot(outlier.colour = "hotpink") +
+  geom_jitter(position = position_jitter(width = 0.1, height = 0), alpha = 1/4) +
+  ggtitle("Deaths by Age Group with Outliers") +
+  xlab ("Age Group") +
+  ylab ("Log10 Deaths")
+  
+##with SIDS data
+ggplot(COD3, aes(x=Population, y=deaths, colour=as.factor(age.cat))) +
+  geom_point() +
+  geom_smooth(method=lm) +
+  ggtitle("SIDS Rates by Population Grouped by Age") +
+  xlab("Population") +
+  ylab("Number of SIDS Deaths") +
+  guides(colour = guide_legend(title = "Age Group"))
+
+#explore SIDS data
+#ggplot(COD3, aes(x=tcrude.rate, fill=urbanization)) + geom_density(alpha=.3)
+
+ggplot(COD3, aes(x=deaths, fill=urbanization)) +
+  geom_density(alpha=.3) +
+  ggtitle("Density Plot of SIDS Data") +
+  xlab ("Log10 Deaths")
+  
+#ggplot(COD3, aes(x=age.cat, y=deaths, fill=urbanization)) + geom_boxplot()
+
+
 ```
 
 ## Methods and Analysis 
 
-_TYPE IN YOUR TEXT HERE - DELETE THIS FOR FINAL REPORT: For each of your research questions, please state what statistical analysis methods or models you used to "test" or answer each question. Be sure to also state what assumptions were made and how you checked your assumptions. Then provide the results of each statistical test or model and write your interpretation of these results._
+Due to the smaller amount of data present when restricted to the subset of the SIDS ICD-10 code I chose to run analysis on both the overall data set and the subset.  Therefore my question then became if there was any association between urbanization level and infant death and more specifically death as a result of SIDS.  Since this was a continuous y and categorical x I chose to use ANOVA as the primary analysis method. I assumed the transformed data would behave as normal. 
+
+#Output of Model for SIDS Subset of Data 
+```{r}
+
+#ANOVA for SIDS with age
+AnovaModel.3 <- lm(crude.rate ~ age.cat*urbanization, data=COD, 
+  contrasts=list(age.cat ="contr.Sum", urbanization ="contr.Sum"))
+Anova(AnovaModel.3)
+with(COD, (tapply(crude.rate, list(age.cat, urbanization), mean, 
+  na.rm=TRUE))) # means
+with(COD, (tapply(crude.rate, list(age.cat, urbanization), sd, 
+  na.rm=TRUE))) # std. deviations
+xtabs(~ age.cat + urbanization, data=COD) # counts
+```
+
+With the inclusion of age, urbanization is not a statistically significant variable in SIDS death. Age is significant, which makes sense because the age categories are grouped in a very uneven manner. Next I will use ANOVA to analyze the full dataset (without day 1 death data).
+
+#Output of Full Data Analysis
+```{r}
+#using COD2
+AnovaModel.4 <- lm(Deaths ~ age.group*urbanization, data=COD2, 
+  contrasts=list(age.group ="contr.Sum", urbanization ="contr.Sum"))
+Anova(AnovaModel.4)
+with(COD2, (tapply(Deaths, list(age.group, urbanization), mean, 
+  na.rm=TRUE))) # means
+with(COD2, (tapply(Deaths, list(age.group, urbanization), sd, 
+  na.rm=TRUE))) # std. deviations
+xtabs(~ age.group + urbanization, data=COD2) # counts
+```
+
+In this analysis both age and urban level are significant variables. 
+
+```{r}
+#logistic regression- I did this first but decided it was not entierly appropriate for the model
+# divide the dataset into a training and a testing set based on a random uniform number on fixed seed, which in this case we are using the date
+# this step is also creating a new variable and adding it to the data set which is a distribution of random numbers from 0 to 1 
+#set.seed(20170328)
+#COD3$group <- runif(length(COD3$Deaths), min = 0, max = 1)
+
+
+#COD3.train <- subset(COD3, group <= 0.80)
+#COD3.test <- subset(COD3, group > 0.80)
+
+#see if it worked
+#summary(COD3.train)
+#summary(COD3.test) 
+
+
+#recoding categorical variables as factors
+#COD3.train$urbanization.f <- factor(COD3.train$urbanization)
+#is.factor(COD3.train$urbanization.f)
+
+#is urbanization a predictor varaible?
+#fit <- lm(Deaths ~ urbanization.f, data= COD3.train)
+#summary(fit)
+```
+
+```{r}
+# divide the dataset into a training and a testing set based on a random uniform number on fixed seed, which in this case we are using the date
+# this step is also creating a new variable and adding it to the data set which is a distribution of random numbers from 0 to 1 
+
+#set.seed(20170328)
+#COD3$group <- runif(length(COD3$Deaths), min = 0, max = 1)
+
+#what random forests do is this process over and over again and makes the aggregate which might be called bootstrapping?
+
+#COD3.train <- subset(COD3, group <= 0.80)
+#COD3.test <- subset(COD3, group > 0.80)
+
+#see if it worked
+#summary(COD3.train)
+#summary(COD3.test) 
+
+
+#recoding categorical variables as factors
+#COD3.train$urbanization.f <- factor(COD3.train$urbanization)
+#is.factor(COD3.train$urbanization.f)
+
+#is urbanization a predictor varaible?
+#fit <- lm(Deaths ~ urbanization.f, data= COD3.train)
+#summary(fit)
+
+```
+
+```{r}
+# divide the dataset into a training and a testing set based on a random uniform number on fixed seed, which in this case we are using the date
+# this step is also creating a new variable and adding it to the data set which is a distribution of random numbers from 0 to 1 
+
+#set.seed(20170328)
+#COD2$group <- runif(length(COD2$Deaths), min = 0, max = 1)
+
+#creating the train and test dataset
+
+#COD2.train <- subset(COD2, group <= 0.80)
+#COD2.test <- subset(COD2, group > 0.80)
+
+#see if it worked
+#summary(COD2.train)
+#summary(COD2.test) 
+
+#are my categorical variables factors?
+#is.factor(COD2$urbanization) #no this was not
+
+#recoding categorical variables as factors
+#COD2.train$urbanization.f <- factor(COD2.train$urbanization)
+#is.factor(COD2.train$urbanization.f)
+
+#is urbanization a predictor varaible?
+#fit3 <- lm(Deaths ~ urbanization.f, data= COD2.train)
+#summary(fit3)
+```
 
 ## Discussion and Conclusions
 
-_TYPE IN YOUR TEXT HERE - DELETE THIS FOR FINAL REPORT: Given your original research questions and results, write a summary of what was found and any conclusions drawn._ 
+After analysis there is not enough evidence to suggest an association between SIDS and urbanization levels.  However there is evidence that shows an association between all types of infant deaths and urbanization levels.  As this was not the original aim of the project it could be considered an incidental finding.  Perhaps the same factors hypothesizes as contributing to the theorized relationship between SIDS and urban level could have the same effect on overall infant deaths.  More urban areas could have higher risk of communicable diseases and more exposure to air pollutants, perhaps increasing risk for respiratory associated deaths.  However urban areas also often provide more accessibility to healthcare and public health education campaigns.  I would be interested in exploring this as a primary question in further analysis and investigating the direction of the relationship.  
 
 ## Limitations
 
-_TYPE IN YOUR TEXT HERE - DELETE THIS FOR FINAL REPORT: Please describe any limitations related to your dataset, original versus possibly revised research questions, and conclusions drawn (underlying assumptions, inherent bias, potential confounders, lack of generalizability, or other issues that could not be resolved or addressed)._
+There were many limitations to this analysis.  Access to the dataset was limited from the beginning, forcing exclusion of possibly significant variables such as ethnicity and presence of risk factors.  Furthermore once the SIDS specific data was manipulated it was far too small to do a quality analysis.  Use of a more varied and larger dataset would have vastly increased the validity of the findings.  
 
 ## References
 
-_TYPE IN YOUR TEXT HERE - DELETE THIS FOR FINAL REPORT: Please provide any references or citations relevant to your report here. DO NOT worry about the formatting of these citations, just be sure to list the usual citation components._
+Carlin RF, Moon RY. Risk Factors, Protective Factors, and Current Recommendations to Reduce Sudden Infant Death Syndrome A Review. JAMA Pediatric. 2017;171(2):175-180. doi:10.1001/jamapediatrics.2016.3345 
+
+Centers for Disease Control and Prevention (2017 February 1). Sudden Unexpected Infant Death and Sudden Infant Death Syndrome Data and Statistics.  Retrieved from https://www.cdc.gov/sids/data.htm
 
 Henderson and Velleman (1981), Building multiple regression models interactively. Biometrics, 37, 391–411.
 
+##Appendix
+#Appendix 1
+```{r}
+gm <- dplyr::group_by(m,`UCD - ICD-10 130 Cause List (Infants)`)
+t1 <- N741pkg::tbl.cat(gm,gm$`UCD - ICD-10 130 Cause List (Infants)`)
+knitr::kable(t1,
+             caption = "Frequency Table for ICD 10 Cause List of Death")
+```
 
