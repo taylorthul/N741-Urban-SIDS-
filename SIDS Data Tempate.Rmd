@@ -42,7 +42,8 @@ _TYPE IN YOUR TEXT HERE - DELETE THIS FOR FINAL REPORT: Please provide an abstra
 
 _As a nurse, my background is in the neonatal intensive care unit (NICU).  In my capacity as a bedside nurse I often discharge patients to home, a process that includes extensive education regarding prevention of sudden infant death syndrome (SIDS).  SIDS, also known as crib or cot death, is the sudden, unexplained death of an infant younger than 1 year old after thorough investigation (CDC, 2017).  SIDS is the leading cause of death in children one month to one year of age.  It is also included as a cause of death in sudden unexpected infant death (SUID), a category that also includes accidental suffocation and strangulation in bed as well as those deaths where the cause remains unknown without a complete investigation (CDC, 2017). Of the 3,7000 SIUD in the United States in 2015, 43% were attributed to SIDS and 32% of unknown cause (CDC, 2017). SUID is a significant health concern and has been the focus of much research and major public health efforts.  Many risk factors have been identified including: prone sleeping, bed sharing, loose bedding, maternal smoking, and premature birth (Carlin & Moon, 2017).  A public education campaign, Safe to Sleep, launched in 1994 had great success in lowering the rate of SIDS death by more than 50% (NIH, 2017).  However since that time the rates have remained relatively unchanged and there are no clear answers regarding the etiology of the disease. 
 _As a researcher, my interests focus on maternal/ infant health so I often encounter vital statistics and other data on SIDS reporting on a variety of variables.  However, I often wonder what other variables not reported may influence SIDS rates.  One is particular is if urbanization is at all associated with SIDS rates.  I would postulate more urban settings would facilitate greater exposure to education campaigns and other resources but also could increase exposure to air pollution and communicable diseases.  There could, of course, be many confounding variables in the proposed relationship but the first step is establishing if any association exists.
-_Therefore the purpose of this paper is to explore any association between urbanization and sudden infant death syndrome (SIDS).  
+  Therefore the purpose of this paper is to explore any association between urbanization and sudden infant death syndrome (SIDS).  The null hypothesis is all levels of urbanization are equal (ie there is not relationship between urbanization and SIDS): H0: U1=U2=U3=U4=U5
+  The alternative hypothesis is not all levels of urbanization are equal and there is a relationship between SIDS and urbanization.
 
 
 ## Dataset Description and Summary
@@ -157,16 +158,11 @@ knitr::kable(rbind(t1,t2,t3),
 
 
 ```{r}
-m <- COD
-gm <- dplyr::group_by(m,urbanization)
-t1 <- N741pkg::tbl.cat(gm,gm$urbanization)
+m <- COD3
+gm <- dplyr::group_by(m,"UCD - ICD-10 130 Cause List (Infants)")
+t1 <- N741pkg::tbl.cat(gm,gm$`UCD - ICD-10 130 Cause List (Infants)`)
 knitr::kable(t1,
-             caption = "Frequency Table for Urbanization")
-
-gm <- dplyr::group_by(m,`Infant Age Groups`)
-t1 <- N741pkg::tbl.cat(gm,gm$`Infant Age Groups`)
-knitr::kable(t1,
-             caption = "Frequency Table for Infant Age Groups")
+             caption = "Frequency Table for ICD 10 Cause List of Death")
 ```
 #For Frequency Table of ICD 10 Cause List of Death see Appendix 1
 
@@ -318,7 +314,7 @@ with(COD, (tapply(crude.rate, list(age.cat, urbanization), sd,
 xtabs(~ age.cat + urbanization, data=COD) # counts
 ```
 
-With the inclusion of age, urbanization is not a statistically significant variable in SIDS death. Age is significant, which makes sense because the age categories are grouped in a very uneven manner. Next I will use ANOVA to analyze the full dataset (without day 1 death data).
+With the inclusion of age, urbanization is not a statistically significant variable in SIDS death. Age is significant, which makes sense because the age categories are grouped in a very uneven manner. Therefore I will reject the alternative hypothesis and accept the null.  No post-hoc testing is needed as the alternative is rejected. Next I will use ANOVA to analyze the full dataset (without day 1 death data).
 
 #Output of Full Data Analysis
 ```{r}
@@ -334,6 +330,12 @@ xtabs(~ age.group + urbanization, data=COD2) # counts
 ```
 
 In this analysis both age and urban level are significant variables. 
+
+
+```{r}
+plot(AnovaModel.4)
+```
+
 
 ```{r}
 #logistic regression- I did this first but decided it was not entierly appropriate for the model
@@ -434,9 +436,16 @@ Henderson and Velleman (1981), Building multiple regression models interactively
 ##Appendix
 #Appendix 1
 ```{r}
-gm <- dplyr::group_by(m,`UCD - ICD-10 130 Cause List (Infants)`)
-t1 <- N741pkg::tbl.cat(gm,gm$`UCD - ICD-10 130 Cause List (Infants)`)
+m <- COD
+gm <- dplyr::group_by(m,urbanization)
+t1 <- N741pkg::tbl.cat(gm,gm$urbanization)
 knitr::kable(t1,
-             caption = "Frequency Table for ICD 10 Cause List of Death")
+             caption = "Frequency Table for Urbanization")
+
+gm <- dplyr::group_by(m,'Infant Age Groups')
+t1 <- N741pkg::tbl.cat(gm,gm$`Infant Age Groups`)
+knitr::kable(t1,
+             caption = "Frequency Table for Infant Age Groups")
+
 ```
 
