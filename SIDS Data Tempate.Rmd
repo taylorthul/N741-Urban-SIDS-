@@ -34,8 +34,7 @@ library(xtable)
 
 ## Abstract
 
-_TYPE IN YOUR TEXT HERE - DELETE THIS FOR FINAL REPORT: Please provide an abstract with only a sentence or two each on these items: the purpose of your project, your research questions, analysis methods, results, and conclusions (approximately 300 words)._
-
+  Sudden Infant Death Syndrome (SIDS) kills thousands of infants year for reasons that remain unclear. Though there have been major advances in the prevention of SIDS, advancement has stalled in recent years.  To continue progress new risk factors must be identified to tailor prevention measures.  For this study we will investigate any associations between SIDS and urbanization. Utilizing data from the CDC failed to show evidence for a significant relationship between SIDS and urbanization.  We did, however, find an association for all types of infant death and urbanization.  This potential effect of city size and type on infant health is a promising area of future research.
 
 
 ## Introduction
@@ -109,13 +108,18 @@ COD$age.cat <- revalue(COD$age.group, c("1d"="1", "1-6d"="2", "7-27d"="3", "28-3
 COD$crude.rate<-as.numeric(COD$crude.rate) 
 
 ```
-#Summary of SIDS Subdata
+#Summary of > 1 Day Subdata
 
 ```{r}
 # using subset function to eliminate day 1 age group
 COD2 <- subset(COD, age.cat > 1, 
 select=c(urbanization:age.cat))
+summary(COD2)
+```
 
+#Summary of SIDS Subdata
+
+```{r}
 #data looking at just SIDS
 COD3 <- subset(COD, icd == "GR130-135", 
 select=c(urbanization:age.cat))
@@ -158,11 +162,18 @@ knitr::kable(rbind(t1,t2,t3),
 
 
 ```{r}
-m <- COD3
-gm <- dplyr::group_by(m,"UCD - ICD-10 130 Cause List (Infants)")
-t1 <- N741pkg::tbl.cat(gm,gm$`UCD - ICD-10 130 Cause List (Infants)`)
+m <- COD
+gm <- dplyr::group_by(m,urbanization)
+t1 <- N741pkg::tbl.cat(gm,gm$urbanization)
 knitr::kable(t1,
-             caption = "Frequency Table for ICD 10 Cause List of Death")
+             caption = "Frequency Table for Urbanization")
+
+m <- COD
+gm <- dplyr::group_by(m,`Infant Age Groups`)
+t1 <- N741pkg::tbl.cat(gm,gm$`Infant Age Groups`)
+knitr::kable(t1,
+             caption = "Frequency Table for Infant Age Groups")
+
 ```
 #For Frequency Table of ICD 10 Cause List of Death see Appendix 1
 
@@ -179,7 +190,9 @@ knitr::kable(t1,
              caption = "Frequency Table for Infant Age Groups of SIDS Data")
 
 ```
+
 #Aggregate Data Tables
+
 ```{r}
 #aggregate data 
 t2 <- aggregate(Deaths ~ urbanization + age.group, COD, mean)
@@ -199,7 +212,7 @@ knitr::kable(t4,
 
 
 ### Graphic Representation of Data 
-
+*note all non-SIDS graphs are based on the data excluding infants < 1 day
 ```{r}
 ## using subset function 
 COD2 <- subset(COD, age.cat > 1, 
@@ -321,7 +334,7 @@ With the inclusion of age, urbanization is not a statistically significant varia
 #using COD2
 AnovaModel.4 <- lm(Deaths ~ age.group*urbanization, data=COD2, 
   contrasts=list(age.group ="contr.Sum", urbanization ="contr.Sum"))
-Anova(AnovaModel.4)
+COD2Model <- Anova(AnovaModel.4)
 with(COD2, (tapply(Deaths, list(age.group, urbanization), mean, 
   na.rm=TRUE))) # means
 with(COD2, (tapply(Deaths, list(age.group, urbanization), sd, 
@@ -329,16 +342,15 @@ with(COD2, (tapply(Deaths, list(age.group, urbanization), sd,
 xtabs(~ age.group + urbanization, data=COD2) # counts
 ```
 
-In this analysis both age and urban level are significant variables. 
-
-
 ```{r}
+summary(AnovaModel.4)
+summary(COD2Model)
 plot(AnovaModel.4)
 ```
-
+In this analysis both age and urban level are significant variables. However, given the large and varied causes of death and age groupings are.  This would be an interesting direction of future research but would require a separate analysis with the data arranged more appropriately for the question. 
 
 ```{r}
-#logistic regression- I did this first but decided it was not entierly appropriate for the model
+##logistic regression- I did this first but decided it was not entierly appropriate for the model
 # divide the dataset into a training and a testing set based on a random uniform number on fixed seed, which in this case we are using the date
 # this step is also creating a new variable and adding it to the data set which is a distribution of random numbers from 0 to 1 
 #set.seed(20170328)
@@ -360,9 +372,7 @@ plot(AnovaModel.4)
 #is urbanization a predictor varaible?
 #fit <- lm(Deaths ~ urbanization.f, data= COD3.train)
 #summary(fit)
-```
 
-```{r}
 # divide the dataset into a training and a testing set based on a random uniform number on fixed seed, which in this case we are using the date
 # this step is also creating a new variable and adding it to the data set which is a distribution of random numbers from 0 to 1 
 
@@ -437,15 +447,9 @@ Henderson and Velleman (1981), Building multiple regression models interactively
 #Appendix 1
 ```{r}
 m <- COD
-gm <- dplyr::group_by(m,urbanization)
-t1 <- N741pkg::tbl.cat(gm,gm$urbanization)
+gm <- dplyr::group_by(m,`UCD - ICD-10 130 Cause List (Infants)`)
+t1 <- N741pkg::tbl.cat(gm,gm$`UCD - ICD-10 130 Cause List (Infants)`)
 knitr::kable(t1,
-             caption = "Frequency Table for Urbanization")
-
-gm <- dplyr::group_by(m,'Infant Age Groups')
-t1 <- N741pkg::tbl.cat(gm,gm$`Infant Age Groups`)
-knitr::kable(t1,
-             caption = "Frequency Table for Infant Age Groups")
-
+             caption = "Frequency ICD- 10 Causes of Death")
 ```
 
