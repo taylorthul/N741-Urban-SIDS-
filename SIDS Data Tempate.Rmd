@@ -443,6 +443,9 @@ Centers for Disease Control and Prevention (2017 February 1). Sudden Unexpected 
 
 Henderson and Velleman (1981), Building multiple regression models interactively. Biometrics, 37, 391–411.
 
+##Github
+The repository for this work may be found at (https://github.com/taylorthul/N741-Urban-SIDS-)[https://github.com/taylorthul/N741-Urban-SIDS-]
+
 ##Appendix
 #Appendix 1
 ```{r}
